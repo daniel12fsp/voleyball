@@ -1,21 +1,21 @@
 {
-  "name": "Vôlei Score",
-  "short_name": "Vôlei",
+  "name": "Volei Score",
+  "short_name": "Volei",
+  "start_url": "/",
   "display": "fullscreen",
   "orientation": "landscape",
-  "start_url": "/",
-  "scope": "/",
-  "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
+  "background_color": "#0b1022",
+  "theme_color": "#0b1022",
+  "lang": "pt",
   "icons": [
     {
-      "src": "icon.svg",
+      "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "icon.png",
+      "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
