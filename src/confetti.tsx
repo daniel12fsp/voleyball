@@ -29,7 +29,7 @@ export default function Confetti() {
             width: `${piece.size}px`,
             height: `${piece.size * 1.6}px`,
             backgroundColor: piece.color,
-            animation: `confetti-fly 1.8s ease-out ${piece.delay}s forwards`,
+            animation: `confetti-fly 1.8s ease-out ${piece.delay}s infinite`,
             transform: `translate(-50%, -50%) translate(${piece.x}px, ${piece.y}px) rotate(${piece.rot}deg)`,
           }}
         />

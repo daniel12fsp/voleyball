@@ -43,12 +43,6 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!state.winnerOverlayVisible) return
-    const timer = window.setTimeout(() => dispatch({ type: 'WINNER_OVERLAY_TIMEOUT' }), 3000)
-    return () => window.clearTimeout(timer)
-  }, [state.winnerOverlayVisible])
-
-  useEffect(() => {
     if (state.scoreEventId <= lastScoreEventIdRef.current) return
     lastScoreEventIdRef.current = state.scoreEventId
     vibrateScore()
@@ -207,7 +201,7 @@ export default function App() {
           blue={state.scores.blue}
           redWinsLabel={tx.redWins}
           blueWinsLabel={tx.blueWins}
-          onTapTeam={(team) => dispatch({ type: 'SCORE_TAP', team })}
+          onTapTeam={() => dispatch({ type: 'RESET_SET' })}
         />
       ) : null}
 

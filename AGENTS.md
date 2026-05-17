@@ -27,9 +27,8 @@
 
 ## Winner flow
 - Fullscreen winner overlay in team color, winner-first final score.
-- Overlay duration 3s.
-- Tap during overlay => immediate new set + tapped team gets 1.
-- After timeout, next tap starts fresh set + tapped team gets 1.
+- Confetti loops until user tap.
+- Tap anywhere on overlay dismisses + resets set to `0-0`.
 
 ## Platform
 - Fullscreen toggle in settings; detect external exit and show dismissible hint.

@@ -23,7 +23,7 @@ describe('state reducer', () => {
     expect(isUndoVisible(start)).toBe(false)
   })
 
-  it('enters winner overlay and pending new set', () => {
+  it('enters winner overlay; score taps are ignored until reset', () => {
     let state = initialState('pt')
     state = { ...state, target: 3 }
     state = reducer(state, { type: 'SCORE_TAP', team: 'red' })
@@ -33,13 +33,12 @@ describe('state reducer', () => {
     expect(state.winner).toBe('red')
     expect(state.winnerOverlayVisible).toBe(true)
 
-    const timeout = reducer(state, { type: 'WINNER_OVERLAY_TIMEOUT' })
-    expect(timeout.winnerOverlayVisible).toBe(false)
-    expect(timeout.pendingNewSet).toBe(true)
+    const ignored = reducer(state, { type: 'SCORE_TAP', team: 'blue' })
+    expect(ignored).toEqual(state)
 
-    const nextTap = reducer(timeout, { type: 'SCORE_TAP', team: 'blue' })
-    expect(nextTap.scores).toEqual({ red: 0, blue: 1 })
-    expect(nextTap.history).toEqual([{ red: 0, blue: 0 }])
+    const reset = reducer(state, { type: 'RESET_SET' })
+    expect(reset.scores).toEqual({ red: 0, blue: 0 })
+    expect(reset.winnerOverlayVisible).toBe(false)
   })
 
   it('freezes deadlock at 99-99', () => {
@@ -150,6 +149,13 @@ describe('state reducer', () => {
 
     const noToast = reducer(cleared, { type: 'CLEAR_TOAST' })
     expect(noToast).toEqual(cleared)
+  })
+
+  it('closes winner overlay on timeout when visible (legacy action)', () => {
+    const state = { ...initialState('pt'), winnerOverlayVisible: true, winner: 'red' as const }
+    const next = reducer(state, { type: 'WINNER_OVERLAY_TIMEOUT' })
+    expect(next.winnerOverlayVisible).toBe(false)
+    expect(next.pendingNewSet).toBe(true)
   })
 
   it('ignores overlay timeout when overlay is hidden', () => {

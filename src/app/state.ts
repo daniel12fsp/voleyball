@@ -125,14 +125,8 @@ export const reducer = (state: GameState, action: Action): GameState => {
   switch (action.type) {
     case 'SCORE_TAP': {
       if (state.winnerOverlayVisible || state.pendingNewSet) {
-        const resetState = newSet(state)
-        const nextScores = addPoint(resetState.scores, action.team)
-        return {
-          ...resetState,
-          scores: nextScores,
-          history: [resetState.scores],
-          scoreEventId: state.scoreEventId + 1,
-        }
+        // Winner overlay is tap-to-dismiss now; ignore score taps while visible.
+        return state
       }
 
       if (getLockReason(state) !== LockReason.none) return state
