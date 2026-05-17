@@ -1,14 +1,14 @@
-const CACHE_NAME = 'volei-score-v1';
+const CACHE_NAME = 'volei-score-v2';
 
 const PRECACHE = [
   '/',
   '/index.html',
   '/app.js',
   '/confetti.js',
-  '/i18n.js',
   '/styles.css',
   '/manifest.webmanifest',
   '/icon.svg',
+  '/icon.png',
   'https://esm.sh/preact@10.29.2',
   'https://esm.sh/preact@10.29.2/hooks',
   'https://esm.sh/htm@3.1.1'

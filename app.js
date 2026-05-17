@@ -1,10 +1,55 @@
 import { h, render } from 'https://esm.sh/preact@10.29.2';
 import { useState, useEffect, useReducer, useRef, useCallback } from 'https://esm.sh/preact@10.29.2/hooks';
 import htm from 'https://esm.sh/htm@3.1.1';
-import t from './i18n.js';
-import Confetti from './confetti.js';
 
 const html = htm.bind(h);
+
+const t = {
+  pt: {
+    setTo: (n) => `ATÉ ${n}`,
+    redWins: 'VERMELHO GANHOU',
+    blueWins: 'AZUL GANHOU',
+    setPoint: 'PONTO DO SET',
+    settings: 'Configurações',
+    targetPoints: 'Pontos meta',
+    language: 'Idioma',
+    fullscreen: 'Tela cheia',
+    reset: 'Reiniciar',
+    resetConfirm: 'Tem certeza que deseja reiniciar?',
+    confirm: 'Sim',
+    cancel: 'Cancelar',
+    undo: 'Desfazer',
+    install: 'Instale este app para uso offline em tela cheia',
+    readyOffline: 'Pronto para uso offline',
+    updateAvailable: 'Atualização disponível',
+    reload: 'Recarregar',
+    installFullscreen: 'Instale o app para modo tela cheia',
+    deadlock: 'Empate sem vencedor possível. Reinicie o set.',
+    newSet: 'Novo set'
+  },
+  en: {
+    setTo: (n) => `SET TO ${n}`,
+    redWins: 'RED WINS',
+    blueWins: 'BLUE WINS',
+    setPoint: 'SET POINT',
+    settings: 'Settings',
+    targetPoints: 'Target points',
+    language: 'Language',
+    fullscreen: 'Fullscreen',
+    reset: 'Reset',
+    resetConfirm: 'Are you sure you want to reset?',
+    confirm: 'Yes',
+    cancel: 'Cancel',
+    undo: 'Undo',
+    install: 'Install this app for fullscreen offline use',
+    readyOffline: 'Ready offline',
+    updateAvailable: 'Update available',
+    reload: 'Reload',
+    installFullscreen: 'Install app for fullscreen mode',
+    deadlock: 'No winner possible. Please reset the set.',
+    newSet: 'New set'
+  }
+};
 
 /* ── helpers ── */
 
@@ -58,6 +103,7 @@ function reducer(state, action) {
       let newRed = state.scoreRed, newBlue = state.scoreBlue;
       if (team === 'red') newRed++;
       else newBlue++;
+      if (navigator.vibrate) navigator.vibrate(50);
       if (checkWinner(newRed, newBlue, state.targetPoints)) {
         return { ...state, scoreRed: newRed, scoreBlue: newBlue, history: newHistory, winner: team, showOverlay: true };
       }
@@ -124,12 +170,10 @@ function Scoreboard({ state, dispatch, tx }) {
 
   const scoreRed = (e) => {
     e.preventDefault();
-    if (navigator.vibrate) navigator.vibrate(50);
     dispatch({ type: 'SCORE', team: 'red' });
   };
   const scoreBlue = (e) => {
     e.preventDefault();
-    if (navigator.vibrate) navigator.vibrate(50);
     dispatch({ type: 'SCORE', team: 'blue' });
   };
 
@@ -143,15 +187,6 @@ function Scoreboard({ state, dispatch, tx }) {
       <div class="side side-blue" onPointerDown=${scoreBlue}>
         <span class="score">${state.scoreBlue}</span>
         ${setPointBlue && html`<span class="set-point">${tx.setPoint}</span>`}
-      </div>
-      <div class="top-bar">
-        <span class="set-label">${tx.setTo(state.targetPoints)}</span>
-        <button class="settings-btn" onClick=${() => dispatch({ type: 'TOGGLE_SETTINGS' })} aria-label=${tx.settings}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
-        </button>
       </div>
     </div>
   `;
@@ -220,18 +255,33 @@ function SettingsModal({ state, dispatch, tx }) {
 }
 
 function WinnerOverlay({ state, dispatch, tx }) {
+  const [ConfettiComp, setConfettiComp] = useState(null);
   const isRed = state.winner === 'red';
   const colorClass = isRed ? 'win-red' : 'win-blue';
   const winText = isRed ? tx.redWins : tx.blueWins;
   const first = isRed ? state.scoreRed : state.scoreBlue;
   const second = isRed ? state.scoreBlue : state.scoreRed;
 
+  useEffect(() => {
+    import('./confetti.js').then(m => setConfettiComp(() => m.default));
+  }, []);
+
+  const startNewSet = (team, e) => {
+    e.stopPropagation();
+    dispatch({ type: 'HIDE_OVERLAY' });
+    dispatch({ type: 'SCORE', team });
+  };
+
   return html`
-    <div class="winner-overlay ${colorClass}" onPointerDown=${() => dispatch({ type: 'HIDE_OVERLAY' })}>
-      <${Confetti} />
+    <div class="winner-overlay ${colorClass}">
+      ${ConfettiComp && html`<${ConfettiComp} />`}
       <div class="winner-content">
         <span class="winner-text">${winText}</span>
         <span class="winner-score">${first} – ${second}</span>
+      </div>
+      <div class="winner-tap-zones">
+        <div class="winner-tap-zone" onPointerDown=${(e) => startNewSet('red', e)}></div>
+        <div class="winner-tap-zone" onPointerDown=${(e) => startNewSet('blue', e)}></div>
       </div>
     </div>
   `;
@@ -242,6 +292,107 @@ function UndoButton({ state, dispatch, tx }) {
   if (!visible) return null;
   return html`
     <button class="undo-btn" onClick=${() => dispatch({ type: 'UNDO' })}>${tx.undo}</button>
+  `;
+}
+
+function RestartButton({ state, dispatch, tx }) {
+  const holdRef = useRef(null);
+  const ringRef = useRef(null);
+  const cancelRef = useRef(() => {});
+  const prevScores = useRef({ red: 0, blue: 0 });
+
+  const cancelHold = useCallback(() => {
+    const h = holdRef.current;
+    if (h) {
+      cancelAnimationFrame(h.raf);
+      holdRef.current = null;
+    }
+    if (ringRef.current) {
+      ringRef.current.style.strokeDashoffset = ringRef.current.getAttribute('stroke-dasharray');
+    }
+  }, []);
+
+  cancelRef.current = cancelHold;
+
+  useEffect(() => {
+    if (holdRef.current && (state.settingsOpen ||
+        state.scoreRed !== prevScores.current.red ||
+        state.scoreBlue !== prevScores.current.blue)) {
+      cancelRef.current();
+    }
+    prevScores.current = { red: state.scoreRed, blue: state.scoreBlue };
+  });
+
+  const onPointerDown = useCallback((e) => {
+    e.preventDefault();
+    if (holdRef.current || state.settingsOpen) return;
+    const duration = 3000;
+    const circumference = 2 * Math.PI * 15;
+    const start = performance.now();
+
+    holdRef.current = { start };
+
+    const tick = (now) => {
+      if (!holdRef.current) return;
+      const elapsed = now - holdRef.current.start;
+      const progress = Math.min(elapsed / duration, 1);
+
+      if (ringRef.current) {
+        ringRef.current.style.strokeDashoffset = circumference * (1 - progress);
+      }
+
+      if (progress >= 1) {
+        holdRef.current = null;
+        if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+        dispatch({ type: 'RESET' });
+        return;
+      }
+
+      holdRef.current.raf = requestAnimationFrame(tick);
+    };
+
+    holdRef.current.raf = requestAnimationFrame(tick);
+  }, [dispatch, state.settingsOpen]);
+
+  const onPointerUp = useCallback(() => {
+    cancelHold();
+  }, [cancelHold]);
+
+  if (state.winner || state.showOverlay || state.deadlock) return null;
+
+  return html`
+    <button class="restart-btn"
+      onPointerDown=${onPointerDown}
+      onPointerUp=${onPointerUp}
+      onPointerLeave=${onPointerUp}
+      onPointerCancel=${onPointerUp}
+      aria-label=${tx.reset}>
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1 4 1 10 7 10"></polyline>
+        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+      </svg>
+      <svg class="restart-ring" width="36" height="36" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="15"
+          fill="none" stroke="#e94560" stroke-width="2"
+          stroke-dasharray="94.248" stroke-dashoffset="94.248"
+          ref=${ringRef} />
+      </svg>
+    </button>
+  `;
+}
+
+function TopBar({ state, dispatch, tx }) {
+  return html`
+    <div class="top-bar">
+      <span class="set-label">${tx.setTo(state.targetPoints)}</span>
+      <button class="settings-btn" onClick=${() => dispatch({ type: 'TOGGLE_SETTINGS' })} aria-label=${tx.settings}>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+      <${RestartButton} state=${state} dispatch=${dispatch} tx=${tx} />
+    </div>
   `;
 }
 
@@ -293,6 +444,11 @@ function App() {
   const installPromptRef = useRef(null);
   const updateSWRef = useRef(null);
   const overlayTimerRef = useRef(null);
+
+  // Sync html lang attribute
+  useEffect(() => {
+    document.documentElement.lang = state.lang;
+  }, [state.lang]);
 
   // Overlay auto-dismiss timer
   useEffect(() => {
@@ -452,9 +608,10 @@ function App() {
   }, [state.toast, handleInstallDismiss]);
 
   return html`
-    <div>
+    <div onContextMenu=${(e) => e.preventDefault()}>
       <div class="app" onPointerDown=${handlePageInteraction}>
         <${Scoreboard} state=${state} dispatch=${dispatch} tx=${tx} />
+        <${TopBar} state=${state} dispatch=${dispatch} tx=${tx} />
         ${state.settingsOpen && html`<${SettingsModal} state=${state} dispatch=${dispatch} tx=${tx} />`}
         <${UndoButton} state=${state} dispatch=${dispatch} tx=${tx} />
         ${state.toast && html`
@@ -473,7 +630,7 @@ function App() {
           </div>
         `}
       </div>
-      ${state.showOverlay && state.winner && html`<${WinnerOverlay} state=${state} dispatch=${dispatch} tx=${tx} />`}
+      ${state.showOverlay && html`<${WinnerOverlay} state=${state} dispatch=${dispatch} tx=${tx} />`}
       ${state.deadlock && html`<${DeadlockDialog} dispatch=${dispatch} tx=${tx} />`}
     </div>
   `;
