@@ -7,7 +7,7 @@ export const messages = {
     red: 'VERMELHO',
     blue: 'AZUL',
     setTo: (n: number) => `VENCE EM ${n} PONTOS`,
-    setPoint: 'PONTO DO SET',
+    setPoint: 'PONTO PARA FECHAR O SET',
     redWins: 'VERMELHO GANHOU',
     blueWins: 'AZUL GANHOU',
     settings: 'Configurações',
