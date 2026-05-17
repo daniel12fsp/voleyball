@@ -44,3 +44,6 @@
 - Keep React Compiler plugin enabled in Vite config.
 - Coverage policy: adapters are browser API wrappers; mock adapters in unit tests.
 - Coverage gate excludes `src/adapters/**`; enforce coverage on app/components.
+- Coverage recovery pattern: add per-component render/interaction tests for `src/components/**` (not only reducer tests).
+- Deterministic hold-to-reset tests require mocking `performance.now` + `requestAnimationFrame`.
+- For modal overlay behavior, test both backdrop close and inner `stopPropagation` paths.
