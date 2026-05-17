@@ -1,3 +1,7 @@
+/**
+ * Browser API adapter.
+ * Testing policy: mock this module in component/app unit tests.
+ */
 const DISMISS_KEY = 'install-hint:v1'
 
 export interface InstallPromptEvent extends Event {

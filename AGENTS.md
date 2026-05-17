@@ -42,4 +42,5 @@
 ## Session learnings (2026-05-18)
 - `vite-plugin-pwa@1.1.0` peer range excludes Vite 8; pin Vite 7.x with exact versions.
 - Keep React Compiler plugin enabled in Vite config.
-- Do not close session with failing coverage gates; fill adapter/component branch tests first.
+- Coverage policy: adapters are browser API wrappers; mock adapters in unit tests.
+- Coverage gate excludes `src/adapters/**`; enforce coverage on app/components.

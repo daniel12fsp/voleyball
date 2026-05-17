@@ -1,3 +1,7 @@
+/**
+ * Browser API adapter.
+ * Testing policy: mock this module in component/app unit tests.
+ */
 export const vibrate = (pattern: number | number[]): void => {
   if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return
   navigator.vibrate(pattern)

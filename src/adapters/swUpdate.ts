@@ -1,3 +1,7 @@
+/**
+ * Browser API adapter.
+ * Testing policy: mock this module in component/app unit tests.
+ */
 export interface SWController {
   register(onUpdate: () => void, onOfflineReady: () => void): Promise<void>
   applyUpdateAndReload(): Promise<void>

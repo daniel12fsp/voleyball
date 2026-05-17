@@ -1,3 +1,7 @@
+/**
+ * Browser API adapter.
+ * Testing policy: mock this module in component/app unit tests.
+ */
 export interface FullscreenAdapter {
   isFullscreen(): boolean
   request(): Promise<boolean>

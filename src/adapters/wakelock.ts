@@ -1,3 +1,7 @@
+/**
+ * Browser API adapter.
+ * Testing policy: mock this module in component/app unit tests.
+ */
 type WakeLockSentinelLike = { release: () => Promise<void> }
 
 export interface WakeLockController {
