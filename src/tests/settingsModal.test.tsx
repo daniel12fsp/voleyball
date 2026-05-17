@@ -11,12 +11,15 @@ const tx = {
   resetConfirm: 'Are you sure?',
   confirm: 'Yes',
   cancel: 'Cancel',
+  installAction: 'Install',
 }
 
 describe('SettingsModal', () => {
   it('returns null when closed', () => {
     const dispatch = vi.fn()
-    const view = render(<SettingsModal state={initialState('pt')} dispatch={dispatch} tx={tx} onToggleFullscreen={vi.fn()} />)
+    const view = render(
+      <SettingsModal state={initialState('pt')} dispatch={dispatch} tx={tx} onToggleFullscreen={vi.fn()} onInstall={vi.fn()} />,
+    )
     expect(view.container.firstChild).toBeNull()
   })
 
@@ -25,7 +28,9 @@ describe('SettingsModal', () => {
     const onToggleFullscreen = vi.fn()
     const open = { ...initialState('pt'), settingsOpen: true, target: 12, lang: 'pt' as const }
 
-    const { rerender } = render(<SettingsModal state={open} dispatch={dispatch} tx={tx} onToggleFullscreen={onToggleFullscreen} />)
+    const { rerender } = render(
+      <SettingsModal state={open} dispatch={dispatch} tx={tx} onToggleFullscreen={onToggleFullscreen} onInstall={vi.fn()} />,
+    )
 
     const section = screen.getByText('Settings').closest('section')!
     fireEvent.pointerDown(section)
@@ -52,6 +57,7 @@ describe('SettingsModal', () => {
         dispatch={dispatch}
         tx={tx}
         onToggleFullscreen={onToggleFullscreen}
+        onInstall={vi.fn()}
       />,
     )
 

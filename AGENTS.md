@@ -16,11 +16,12 @@
 
 ## UI/behavior
 - Landscape-first; red left, blue right; huge responsive scores.
-- Top center: `SET TO N` + settings.
-- Undo bottom-center; show only active play with history.
+- Top bar: full-width dark bar showing `VENCE EM N PONTOS` + settings.
+- Undo center; hold ~700ms to undo; show only active play with history.
 - Reset paths:
-  - Hold-to-reset 3s in top bar (cancel on pointer cancel/up/leave, score change, settings open, overlay/deadlock).
-  - Settings reset with confirm.
+  - Manual reset via Settings with confirm.
+  - Deadlock dialog: `Novo set` (direct).
+  - Winner overlay: tap to start a new set (direct).
 - Settings modal pauses scoring.
 - Disable context menu/text selection/scroll/overscroll/touch callout.
 - Safe-area insets required.

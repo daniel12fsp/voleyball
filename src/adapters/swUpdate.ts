@@ -14,6 +14,7 @@ export const createSWController = (): SWController => {
 
   return {
     register: async (onUpdate, onOfflineReady) => {
+      if (import.meta.env.DEV) return
       if (typeof navigator === 'undefined' || !('serviceWorker' in navigator) || !navigator.serviceWorker) return
 
       registration = await navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`)

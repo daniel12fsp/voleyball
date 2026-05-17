@@ -1,102 +1,59 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { ToastHost } from '../components/ToastHost'
 
-const tx = {
-  deadlock: 'Deadlock',
-  readyOffline: 'Ready offline',
-  updateAvailable: 'Update available',
-  installHint: 'Install hint',
-  installFullscreen: 'Install fullscreen',
-  reload: 'Reload',
-  installAction: 'Install',
-}
-
 describe('ToastHost', () => {
   it('renders null without toast', () => {
     const view = render(
-      <ToastHost toast={null} tx={tx} onReload={vi.fn()} onInstall={vi.fn()} onDismissInstall={vi.fn()} />,
+      <ToastHost toast={null} message="" onDismiss={vi.fn()} />,
     )
     expect(view.container.firstChild).toBeNull()
   })
 
-  it('renders update toast and reload action', () => {
-    const onReload = vi.fn()
+  it('renders message', () => {
+    render(
+      <ToastHost toast={{ id: 1, type: 'deadlock' }} message="My toast" onDismiss={vi.fn()} />,
+    )
+    expect(screen.getByText('My toast')).toBeTruthy()
+  })
+
+  it('triggers onDismiss on dismiss button click', () => {
+    const onDismiss = vi.fn()
+    render(
+      <ToastHost toast={{ id: 1, type: 'deadlock' }} message="Dismiss me" onDismiss={onDismiss} />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
+    expect(onDismiss).toHaveBeenCalledOnce()
+  })
+
+  it('renders action buttons and triggers onClick', () => {
+    const onAction = vi.fn()
+    const onDismiss = vi.fn()
     render(
       <ToastHost
         toast={{ id: 1, type: 'updateAvailable' }}
-        tx={tx}
-        onReload={onReload}
-        onInstall={vi.fn()}
-        onDismissInstall={vi.fn()}
+        message="Update"
+        actions={[{ label: 'Reload', onClick: onAction }]}
+        onDismiss={onDismiss}
       />,
     )
-
     fireEvent.click(screen.getByRole('button', { name: 'Reload' }))
-    expect(onReload).toHaveBeenCalled()
+    expect(onAction).toHaveBeenCalledOnce()
+    expect(onDismiss).not.toHaveBeenCalled()
   })
 
-  it('renders install toast actions', () => {
-    const onInstall = vi.fn()
-    const onDismissInstall = vi.fn()
+  it('renders multiple action buttons', () => {
     render(
       <ToastHost
         toast={{ id: 1, type: 'installHint' }}
-        tx={tx}
-        onReload={vi.fn()}
-        onInstall={onInstall}
-        onDismissInstall={onDismissInstall}
+        message="Install"
+        actions={[
+          { label: 'Install', onClick: vi.fn() },
+          { label: 'Later', onClick: vi.fn() },
+        ]}
+        onDismiss={vi.fn()}
       />,
     )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Install' }))
-    fireEvent.click(screen.getByRole('button', { name: '✕' }))
-    expect(onInstall).toHaveBeenCalled()
-    expect(onDismissInstall).toHaveBeenCalled()
-  })
-
-  it('renders default branch messages', () => {
-    const { rerender } = render(
-      <ToastHost
-        toast={{ id: 1, type: 'deadlock' }}
-        tx={tx}
-        onReload={vi.fn()}
-        onInstall={vi.fn()}
-        onDismissInstall={vi.fn()}
-      />,
-    )
-    expect(screen.getByText('Deadlock')).toBeTruthy()
-
-    rerender(
-      <ToastHost
-        toast={{ id: 2, type: 'offlineReady' }}
-        tx={tx}
-        onReload={vi.fn()}
-        onInstall={vi.fn()}
-        onDismissInstall={vi.fn()}
-      />,
-    )
-    expect(screen.getByText('Ready offline')).toBeTruthy()
-
-    rerender(
-      <ToastHost
-        toast={{ id: 3, type: 'fullscreenHint' }}
-        tx={tx}
-        onReload={vi.fn()}
-        onInstall={vi.fn()}
-        onDismissInstall={vi.fn()}
-      />,
-    )
-    expect(screen.getByText('Install fullscreen')).toBeTruthy()
-
-    rerender(
-      <ToastHost
-        toast={{ id: 4, type: 'invalidTarget' }}
-        tx={tx}
-        onReload={vi.fn()}
-        onInstall={vi.fn()}
-        onDismissInstall={vi.fn()}
-      />,
-    )
-    expect(screen.getByText('Deadlock')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Install' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Later' })).toBeTruthy()
   })
 })

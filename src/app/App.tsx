@@ -13,7 +13,7 @@ import { createFullscreenAdapter } from '../adapters/fullscreen'
 import { createInstallController } from '../adapters/installPrompt'
 import { createSWController } from '../adapters/swUpdate'
 import { createWakeLockController } from '../adapters/wakelock'
-import { vibrateReset, vibrateScore } from '../adapters/vibration'
+import { vibrateScore } from '../adapters/vibration'
 
 const fullscreen = createFullscreenAdapter()
 const installer = createInstallController()
@@ -106,12 +106,21 @@ export default function App() {
 
   useEffect(() => {
     const cleanup = installer.init(() => {
+      if (installer.isDismissed()) return
       dispatch({ type: 'SHOW_INSTALL_HINT' })
       dispatch({ type: 'SHOW_TOAST', toastType: 'installHint' })
+      installer.dismissHint()
     })
 
     if (!isInstalled() && !installer.isDismissed()) {
-      window.setTimeout(() => dispatch({ type: 'SHOW_TOAST', toastType: 'installHint' }), 1200)
+      const id = window.setTimeout(() => {
+        dispatch({ type: 'SHOW_TOAST', toastType: 'installHint' })
+        installer.dismissHint()
+      }, 1200)
+      return () => {
+        cleanup()
+        window.clearTimeout(id)
+      }
     }
 
     return cleanup
@@ -122,10 +131,6 @@ export default function App() {
     dispatch({ type: 'SET_FULLSCREEN_ENABLED', value: enabled })
   }
 
-  const handleHoldReset = () => {
-    vibrateReset()
-    dispatch({ type: 'RESET_SET' })
-  }
 
   const handleToastInstall = () => {
     if (installer.canPrompt()) {
@@ -138,11 +143,70 @@ export default function App() {
     window.setTimeout(() => dispatch({ type: 'CLEAR_TOAST' }), 2500)
   }
 
-  const handleDismissInstall = () => {
-    installer.dismissHint()
-    dispatch({ type: 'HIDE_INSTALL_HINT' })
+  const handleSettingsInstall = () => {
+    if (!installer.canPrompt()) return
+    void installer.prompt()
+  }
+
+  // auto-dismiss installHint toast after 5s
+  useEffect(() => {
+    if (!state.toast || state.toast.type !== 'installHint') return
+    const id = window.setTimeout(() => dispatch({ type: 'CLEAR_TOAST' }), 5000)
+    return () => window.clearTimeout(id)
+  }, [state.toast])
+
+  const handleDismissToast = () => {
+    if (state.toast?.type === 'installHint') {
+      installer.dismissHint()
+      dispatch({ type: 'HIDE_INSTALL_HINT' })
+    }
     dispatch({ type: 'CLEAR_TOAST' })
   }
+
+  const toastMessage = useMemo(() => {
+    if (!state.toast) return ''
+    switch (state.toast.type) {
+      case 'deadlock':
+        return tx.deadlock
+      case 'invalidTarget':
+        return tx.invalidTarget
+      case 'offlineReady':
+        return tx.readyOffline
+      case 'updateAvailable':
+        return tx.updateAvailable
+      case 'fullscreenHint':
+        return tx.installFullscreen
+      case 'installHint':
+        return tx.installHint
+    }
+  }, [state.toast, tx])
+
+  const toastActions = useMemo(() => {
+    if (!state.toast) return undefined
+    const actions: { label: string; onClick: () => void }[] = []
+
+    if (state.toast.type === 'updateAvailable') {
+      actions.push({ label: tx.reload, onClick: handleReloadUpdate })
+    }
+
+    if (state.toast.type === 'installHint') {
+      actions.push({ label: tx.installAction, onClick: handleToastInstall })
+    }
+
+    if (state.toast.type === 'invalidTarget') {
+      const toastId = state.toast.id
+      actions.push({
+        label: tx.reset,
+        onClick: () => {
+          dispatch({ type: 'CLEAR_TOAST', id: toastId })
+          dispatch({ type: 'OPEN_SETTINGS' })
+          dispatch({ type: 'OPEN_RESET_CONFIRM' })
+        },
+      })
+    }
+
+    return actions.length > 0 ? actions : undefined
+  }, [state.toast, tx])
 
   const handleReloadUpdate = () => {
     void swController.applyUpdateAndReload()
@@ -152,16 +216,9 @@ export default function App() {
     <div className="relative h-screen w-screen select-none overflow-hidden" onContextMenu={(e) => e.preventDefault()}>
       <ScoreBoard state={state} dispatch={dispatch} tx={{ setPoint: tx.setPoint, red: tx.red, blue: tx.blue }} />
 
-      <TopBar
-        state={state}
-        dispatch={dispatch}
-        setToText={tx.setTo(state.target)}
-        settingsLabel={tx.settings}
-        resetLabel={tx.reset}
-        onHoldReset={handleHoldReset}
-      />
+      <TopBar dispatch={dispatch} setToText={tx.setTo(state.target)} settingsLabel={tx.settings} />
 
-      <UndoButton state={state} dispatch={dispatch} label={tx.undo} />
+      <UndoButton state={state} dispatch={dispatch} label={tx.undo} holdLabel={tx.hold} />
 
       <SettingsModal
         state={state}
@@ -175,8 +232,10 @@ export default function App() {
           resetConfirm: tx.resetConfirm,
           confirm: tx.confirm,
           cancel: tx.cancel,
+          installAction: tx.installAction,
         }}
         onToggleFullscreen={handleToggleFullscreen}
+        onInstall={handleSettingsInstall}
       />
 
       {state.winnerOverlayVisible && state.winner ? (
@@ -196,18 +255,9 @@ export default function App() {
 
       <ToastHost
         toast={state.toast}
-        tx={{
-          deadlock: tx.deadlock,
-          readyOffline: tx.readyOffline,
-          updateAvailable: tx.updateAvailable,
-          installHint: tx.installHint,
-          installFullscreen: tx.installFullscreen,
-          reload: tx.reload,
-          installAction: tx.installAction,
-        }}
-        onReload={handleReloadUpdate}
-        onInstall={handleToastInstall}
-        onDismissInstall={handleDismissInstall}
+        message={toastMessage}
+        actions={toastActions}
+        onDismiss={handleDismissToast}
       />
     </div>
   )

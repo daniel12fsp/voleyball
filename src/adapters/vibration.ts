@@ -9,3 +9,4 @@ export const vibrate = (pattern: number | number[]): void => {
 
 export const vibrateScore = (): void => vibrate(40)
 export const vibrateReset = (): void => vibrate([50, 100, 50])
+export const vibrateUndo = (): void => vibrate(25)

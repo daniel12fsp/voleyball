@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        redTeam: '#cf2e2e',
-        blueTeam: '#1f57d6',
+        redTeam: '#E53935',
+        blueTeam: '#1E88E5',
         bgDark: '#0b1022',
       },
       fontFamily: {

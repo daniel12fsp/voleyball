@@ -4,8 +4,8 @@ describe('i18n', () => {
   it('exports messages in both languages', () => {
     expect(messages.pt.red).toBe('VERMELHO')
     expect(messages.en.blue).toBe('BLUE')
-    expect(messages.pt.setTo(12)).toBe('ATÉ 12')
-    expect(messages.en.setTo(12)).toBe('SET TO 12')
+    expect(messages.pt.setTo(12)).toBe('VENCE EM 12 PONTOS')
+    expect(messages.en.setTo(12)).toBe('WIN AT 12 POINTS')
   })
 
   it('loads saved language and defaults to pt', () => {

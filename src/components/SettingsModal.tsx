@@ -13,11 +13,13 @@ interface Props {
     resetConfirm: string
     confirm: string
     cancel: string
+    installAction: string
   }
   onToggleFullscreen: (enabled: boolean) => void
+  onInstall: () => void
 }
 
-export function SettingsModal({ state, dispatch, tx, onToggleFullscreen }: Props) {
+export function SettingsModal({ state, dispatch, tx, onToggleFullscreen, onInstall }: Props) {
   if (!state.settingsOpen) return null
 
   return (
@@ -71,6 +73,14 @@ export function SettingsModal({ state, dispatch, tx, onToggleFullscreen }: Props
             {state.fullscreenEnabled ? 'ON' : 'OFF'}
           </button>
         </div>
+
+        <button
+          type="button"
+          className="mb-4 w-full rounded-md bg-white px-4 py-2 text-sm font-bold text-neutral-900"
+          onClick={onInstall}
+        >
+          {tx.installAction}
+        </button>
 
         <button
           type="button"
