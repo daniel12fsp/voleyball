@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useReducer, useRef } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useReducer, useRef } from 'react'
 import { messages, loadLang, saveLang } from './i18n'
 import { reducer, initialState } from './state'
 import { ScoreBoard } from '../components/ScoreBoard'
 import { TopBar } from '../components/TopBar'
 import { UndoButton } from '../components/UndoButton'
 import { SettingsModal } from '../components/SettingsModal'
-import { WinnerOverlay } from '../components/WinnerOverlay'
 import { DeadlockDialog } from '../components/DeadlockDialog'
 import { ToastHost } from '../components/ToastHost'
+
+const LazyWinnerOverlay = lazy(() => import('../components/WinnerOverlay').then((m) => ({ default: m.WinnerOverlay })))
 import { createFullscreenAdapter } from '../adapters/fullscreen'
 import { createInstallController } from '../adapters/installPrompt'
 import { createSWController } from '../adapters/swUpdate'
@@ -116,22 +117,6 @@ export default function App() {
     return cleanup
   }, [])
 
-  useEffect(() => {
-    const warm = () => {
-      void import('../confetti')
-    }
-
-    const rIC = (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number })
-      .requestIdleCallback
-
-    if (typeof rIC === 'function') {
-      rIC(warm, { timeout: 2000 })
-      return
-    }
-
-    const timer = window.setTimeout(warm, 1200)
-    return () => window.clearTimeout(timer)
-  }, [])
 
   const handleToggleFullscreen = (enabled: boolean) => {
     dispatch({ type: 'SET_FULLSCREEN_ENABLED', value: enabled })
@@ -165,7 +150,7 @@ export default function App() {
 
   return (
     <div className="relative h-screen w-screen select-none overflow-hidden" onContextMenu={(e) => e.preventDefault()}>
-      <ScoreBoard state={state} dispatch={dispatch} tx={{ setPoint: tx.setPoint }} />
+      <ScoreBoard state={state} dispatch={dispatch} tx={{ setPoint: tx.setPoint, red: tx.red, blue: tx.blue }} />
 
       <TopBar
         state={state}
@@ -195,14 +180,16 @@ export default function App() {
       />
 
       {state.winnerOverlayVisible && state.winner ? (
-        <WinnerOverlay
-          winner={state.winner}
-          red={state.scores.red}
-          blue={state.scores.blue}
-          redWinsLabel={tx.redWins}
-          blueWinsLabel={tx.blueWins}
-          onTapTeam={() => dispatch({ type: 'RESET_SET' })}
-        />
+        <Suspense fallback={null}>
+          <LazyWinnerOverlay
+            winner={state.winner}
+            red={state.scores.red}
+            blue={state.scores.blue}
+            redWinsLabel={tx.redWins}
+            blueWinsLabel={tx.blueWins}
+            onTapTeam={() => dispatch({ type: 'RESET_SET' })}
+          />
+        </Suspense>
       ) : null}
 
       {state.deadlock ? <DeadlockDialog message={tx.deadlock} newSetLabel={tx.newSet} onNewSet={() => dispatch({ type: 'RESET_SET' })} /> : null}

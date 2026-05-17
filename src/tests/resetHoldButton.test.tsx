@@ -19,7 +19,8 @@ describe('ResetHoldButton', () => {
     render(<ResetHoldButton disabled={false} cancelSignal="a" ariaLabel="Reset" onComplete={onComplete} />)
 
     fireEvent.pointerDown(screen.getByRole('button', { name: 'Reset' }))
-    tick?.(3000)
+    expect(tick).not.toBeNull()
+    tick!(3000)
     expect(onComplete).toHaveBeenCalledTimes(1)
 
     now.mockRestore()

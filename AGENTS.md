@@ -41,6 +41,9 @@
 ## Session learnings (2026-05-18)
 - `vite-plugin-pwa@1.1.0` peer range excludes Vite 8; pin Vite 7.x with exact versions.
 - Keep React Compiler plugin enabled in Vite config.
+- `vite preview` uses `command=serve`; base-path logic must key off `mode==='production'`, not `command==='build'`.
+- Don’t preload optional chunks (eg confetti) in App; lazy-load from the winner overlay to avoid Lighthouse critical-chain noise.
+- If transforming `index.html` (SEO+CSP), hash after any HTML reordering/rewrites so CSP hashes match final inline content.
 - Coverage policy: adapters are browser API wrappers; mock adapters in unit tests.
 - Coverage gate excludes `src/adapters/**`; enforce coverage on app/components.
 - Coverage recovery pattern: add per-component render/interaction tests for `src/components/**` (not only reducer tests).

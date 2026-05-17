@@ -144,7 +144,7 @@ describe('state reducer', () => {
     const wrongId = reducer(withToast, { type: 'CLEAR_TOAST', id: 999 })
     expect(wrongId.toast).toEqual(withToast.toast)
 
-    const cleared = reducer(withToast, { type: 'CLEAR_TOAST', id: withToast.toast?.id })
+    const cleared = reducer(withToast, { type: 'CLEAR_TOAST', id: withToast.toast!.id })
     expect(cleared.toast).toBeNull()
 
     const noToast = reducer(cleared, { type: 'CLEAR_TOAST' })
