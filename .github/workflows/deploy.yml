@@ -35,7 +35,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout --orphan deploy
           git rm --cached -r . || true
-          git add dist/ -f
-          touch dist/.nojekyll
+          cp -r dist/* .
+          rm -rf dist
+          touch .nojekyll
+          git add . -f
           git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')"
           git push origin deploy --force

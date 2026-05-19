@@ -64,7 +64,7 @@ const buildIndexMetaAndCsp = (base: string) => {
 }
 
 export default defineConfig(({ mode }) => {
-  const base = mode === 'production' ? '/voley-score/' : '/'
+  const base = mode === 'production' ? '/voleyball/' : '/'
 
   return {
     test: {
