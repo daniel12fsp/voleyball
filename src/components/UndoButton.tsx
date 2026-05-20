@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+} from "react";
 import { isUndoVisible, type Action, type GameState } from "../app/state";
 import { vibrateUndo } from "../adapters/vibration";
 
@@ -12,7 +19,7 @@ interface Props {
 const HOLD_MS = 700;
 const MOVE_CANCEL_PX = 12;
 
-export function UndoButton({ state, dispatch, label, holdLabel }: Props) {
+export function UndoButton({ state, dispatch, label }: Props) {
   const visible = isUndoVisible(state);
   const [holding, setHolding] = useState(false);
 
@@ -31,7 +38,12 @@ export function UndoButton({ state, dispatch, label, holdLabel }: Props) {
     ],
   );
 
-  const holdRef = useRef<{ pointerId: number; raf: number; startX: number; startY: number } | null>(null);
+  const holdRef = useRef<{
+    pointerId: number;
+    raf: number;
+    startX: number;
+    startY: number;
+  } | null>(null);
   const ringRef = useRef<SVGCircleElement | null>(null);
   const circumference = 2 * Math.PI * 16;
 
@@ -40,7 +52,8 @@ export function UndoButton({ state, dispatch, label, holdLabel }: Props) {
     cancelAnimationFrame(holdRef.current.raf);
     holdRef.current = null;
     setHolding(false);
-    if (ringRef.current) ringRef.current.style.strokeDashoffset = `${circumference}`;
+    if (ringRef.current)
+      ringRef.current.style.strokeDashoffset = `${circumference}`;
   }, [circumference]);
 
   useEffect(() => {
@@ -85,7 +98,8 @@ export function UndoButton({ state, dispatch, label, holdLabel }: Props) {
           const tick = (now: number) => {
             if (!holdRef.current) return;
             const progress = Math.min((now - startT) / HOLD_MS, 1);
-            if (ringRef.current) ringRef.current.style.strokeDashoffset = `${circumference * (1 - progress)}`;
+            if (ringRef.current)
+              ringRef.current.style.strokeDashoffset = `${circumference * (1 - progress)}`;
             if (progress >= 1) {
               holdRef.current = null;
               setHolding(false);
@@ -96,7 +110,12 @@ export function UndoButton({ state, dispatch, label, holdLabel }: Props) {
             holdRef.current.raf = requestAnimationFrame(tick);
           };
 
-          holdRef.current = { pointerId: e.pointerId, raf: requestAnimationFrame(tick), startX, startY };
+          holdRef.current = {
+            pointerId: e.pointerId,
+            raf: requestAnimationFrame(tick),
+            startX,
+            startY,
+          };
         }}
         onPointerMove={(e) => {
           if (!holdRef.current) return;
@@ -114,10 +133,15 @@ export function UndoButton({ state, dispatch, label, holdLabel }: Props) {
         onLostPointerCapture={cancelHold}
       >
         <UndoIcon className="h-4 w-4" />
-        <span className="text-[10px] font-black tracking-[0.22em] text-white/85">{holdLabel}</span>
 
         {holding ? (
-          <svg className="pointer-events-none absolute" width="44" height="44" viewBox="0 0 44 44" aria-hidden>
+          <svg
+            className="pointer-events-none absolute"
+            width="44"
+            height="44"
+            viewBox="0 0 44 44"
+            aria-hidden
+          >
             <circle
               ref={ringRef}
               cx="22"

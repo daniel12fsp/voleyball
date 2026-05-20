@@ -39,8 +39,9 @@
 - SW waiting update => toast + reload action (`SKIP_WAITING` flow).
 - Boot timeout fallback screen at 12s if app not mounted.
 
-## Session learnings (2026-05-18)
-- `vite-plugin-pwa@1.1.0` peer range excludes Vite 8; pin Vite 7.x with exact versions.
+## Session learnings (2026-05-19)
+- Extract repeated JSX blocks in same file into separate components in `src/components/`.
+- When refactoring: create new component file first, update import in original, then simplify original.
 - Keep React Compiler plugin enabled in Vite config.
 - `vite preview` uses `command=serve`; base-path logic must key off `mode==='production'`, not `command==='build'`.
 - Don’t preload optional chunks (eg confetti) in App; lazy-load from the winner overlay to avoid Lighthouse critical-chain noise.

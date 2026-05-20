@@ -13,16 +13,19 @@ export function TopBar({ dispatch, setToText, settingsLabel }: Props) {
       className="pointer-events-none fixed inset-x-0 top-0 z-30"
       style={{ height: `calc(env(safe-area-inset-top) + var(--topbar-h))` }}
     >
-      <div className="flex h-full items-end" style={{ paddingTop: `env(safe-area-inset-top)` }}>
+      <div
+        className="flex h-full items-end"
+        style={{ paddingTop: `env(safe-area-inset-top)` }}
+      >
         <div className="h-[var(--topbar-h)] w-full bg-black/70 backdrop-blur-md shadow-[0_8px_22px_rgba(0,0,0,0.35)]">
-          <div className="pointer-events-none mx-auto flex h-full max-w-5xl items-center justify-between gap-3 px-3">
+          <div className="pointer-events-none mx-auto flex h-full max-w-5xl items-center justify-center gap-3 px-3">
             <span className="pointer-events-none rounded-md bg-[#D4AF37] px-3 py-1 text-[11px] font-black italic tracking-wide text-black shadow-[0_2px_0_rgba(0,0,0,0.35)]">
               {setToText}
             </span>
 
             <button
               type="button"
-              className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white ring-1 ring-white/15"
+              className="absolute right-3 pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white ring-1 ring-white/15"
               onClick={() => dispatch({ type: "TOGGLE_SETTINGS" })}
               aria-label={settingsLabel}
             >
@@ -43,5 +46,5 @@ export function TopBar({ dispatch, setToText, settingsLabel }: Props) {
         </div>
       </div>
     </header>
-  )
+  );
 }
