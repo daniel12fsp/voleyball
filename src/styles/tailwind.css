@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --topbar-h: 56px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  user-select: none;
+  background: #0b1022;
+}
+
+@layer components {
+  .score-text {
+    font-variant-numeric: tabular-nums;
+    @apply text-[clamp(5.5rem,24vw,19rem)] font-black leading-none tracking-tight;
+    text-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.25),
+      0 0 18px var(--score-glow, rgba(255, 255, 255, 0.35)),
+      0 0 44px var(--score-glow, rgba(255, 255, 255, 0.18));
+  }
+
+  .score-zone {
+    background:
+      radial-gradient(1200px 700px at 50% 15%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 55%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.24));
+  }
+
+  .set-point-label {
+    @apply pointer-events-none absolute rounded-full bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90;
+    top: calc(env(safe-area-inset-top) + var(--topbar-h) + 8px);
+  }
+
+  .topbar-offset {
+    top: calc(env(safe-area-inset-top) + var(--topbar-h) + 8px);
+  }
+}
+
+@keyframes confetti-fly {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(0px, 0px) rotate(0deg) scale(0.2);
+  }
+}
