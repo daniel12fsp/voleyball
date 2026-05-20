@@ -39,7 +39,8 @@
 - SW waiting update => toast + reload action (`SKIP_WAITING` flow).
 - Boot timeout fallback screen at 12s if app not mounted.
 
-## Session learnings (2026-05-19)
+## Session learnings (2026-05-20)
+- Run `scripts/verify.sh` before finishing code changes.
 - Extract repeated JSX blocks in same file into separate components in `src/components/`.
 - When refactoring: create new component file first, update import in original, then simplify original.
 - Keep React Compiler plugin enabled in Vite config.
@@ -51,3 +52,5 @@
 - Coverage recovery pattern: add per-component render/interaction tests for `src/components/**` (not only reducer tests).
 - Deterministic hold-to-reset tests require mocking `performance.now` + `requestAnimationFrame`.
 - For modal overlay behavior, test both backdrop close and inner `stopPropagation` paths.
+- TSX + V8 branch coverage can report synthetic JSX branches (eg inline style/handler); use `/* c8 ignore next */` for non-semantic branches before excluding files.
+- If branch mapping remains noisy, test `@vitest/coverage-istanbul` as alternate provider and compare signal.

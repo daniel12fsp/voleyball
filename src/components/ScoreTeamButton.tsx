@@ -1,7 +1,6 @@
 interface Props {
   label: string;
   score: number;
-  color: string;
   showSetPoint: boolean;
   setPointText: string;
 }
@@ -9,7 +8,6 @@ interface Props {
 export function ScoreTeamButton({
   label,
   score,
-  color,
   showSetPoint,
   setPointText,
 }: Props) {

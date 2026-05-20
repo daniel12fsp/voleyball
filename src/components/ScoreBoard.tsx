@@ -35,7 +35,6 @@ export function ScoreBoard({ state, dispatch, tx }: Props) {
         <ScoreTeamButton
           label={tx.red}
           score={scores.red}
-          color="red"
           showSetPoint={redSetPoint}
           setPointText={tx.setPoint}
         />
@@ -56,7 +55,6 @@ export function ScoreBoard({ state, dispatch, tx }: Props) {
         <ScoreTeamButton
           label={tx.blue}
           score={scores.blue}
-          color="blue"
           showSetPoint={blueSetPoint}
           setPointText={tx.setPoint}
         />
